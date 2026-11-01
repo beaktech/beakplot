@@ -1,11 +1,14 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "dayclock"
 version = "0.0.0"
 description = "Seasonal bird detection charts with daylight and recording gaps"
+readme = "README.md"
+license = "MIT AND CC-BY-4.0"
+license-files = ["LICENSE", "src/dayclock/resources/IOC-NOTICE.md"]
 requires-python = ">=3.10"
 dependencies = ["matplotlib>=3.6", "numpy>=1.23"]
 
@@ -17,6 +20,9 @@ test = ["pytest>=7"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+dayclock = ["resources/*.json", "resources/*.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

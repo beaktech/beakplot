@@ -2,7 +2,7 @@
 
 import argparse
 from collections import Counter, defaultdict
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from difflib import get_close_matches
 import math
 import os
@@ -16,6 +16,7 @@ from .data import aggregate, retained_records
 from .database import read_database
 from .daily import daily_counts
 from .heatmap import day_clock
+from .names import ALIASES, common_name, preferred_names
 from .style import DEFAULT_SUBTITLE, STYLE
 
 
@@ -63,6 +64,9 @@ def _parser():
                              help="first day, inclusive; default: first retained date across all inputs")
         command.add_argument("--to", dest="end", type=_date, metavar="YYYY-MM-DD",
                              help="last day, inclusive; default: last retained date across all inputs")
+        command.add_argument("--include-partial", action="store_true",
+                             help="keep the last recorded day when it is today in --tz (system zone by default); "
+                                  "today is otherwise excluded, even with --to")
         command.add_argument("--min-confidence", type=_number(0, 1), metavar="SCORE",
                              help="minimum confidence, inclusive (0–1); default: retain all scores")
         command.add_argument("--tz", type=_zone, metavar="ZONE",
@@ -76,7 +80,7 @@ def _parser():
             csv_options.add_argument(f"--{option}-column", dest=f"column_{field}", metavar="HEADER")
         if name == "species":
             continue
-        command.add_argument("--species", required=True, help="scientific name, or an unambiguous common name from the data")
+        command.add_argument("--species", required=True, help="scientific name or unambiguous English common name (case-insensitive)")
         command.add_argument("--out", required=True, type=Path, help="output .svg or .png file (parent directory must exist)")
         command.add_argument("--title", help="chart title; default uses the common name where available")
         command.add_argument("--subtitle", default=DEFAULT_SUBTITLE, help="chart subtitle")
@@ -93,7 +97,12 @@ def _load(args):
     paths = args.db or args.csv
     if args.command == "heatmap" and len(paths) != 1:
         raise ValueError("heatmap needs exactly one input file")
-    resolved = [p.expanduser().resolve(strict=True) for p in paths]
+    resolved = []
+    for path in paths:
+        try:
+            resolved.append(path.expanduser().resolve(strict=True))
+        except FileNotFoundError:
+            raise ValueError(f"Database not found: {path.expanduser()}") from None
     if any(a.samefile(b) for i, a in enumerate(resolved) for b in resolved[i + 1:]):
         raise ValueError("The same input file was supplied more than once")
     columns = {key.removeprefix("column_"): value for key, value in vars(args).items()
@@ -134,11 +143,20 @@ def _species(rows, query):
     exact = sorted(name for name in scientific if name.casefold() == query.casefold())
     if len(exact) == 1:
         return exact[0]
-    names = defaultdict(set)
+    recorded = defaultdict(set)
     for row in rows:
-        names[row.scientific_name.casefold()].add(row.scientific_name)
         if row.common_name:
-            names[row.common_name.casefold()].add(row.scientific_name)
+            recorded[row.common_name.casefold()].add(row.scientific_name)
+    # An exact recorded name takes priority even over another species' bundled
+    # name or alias. Ambiguity in recorded names still needs a scientific name.
+    names = defaultdict(set)
+    for name in scientific:
+        for label in (name, common_name(name), *ALIASES.get(name, ())):
+            names[label.casefold()].add(name)
+    for label, species in recorded.items():
+        names[label].update(species)
+    if query.casefold() in recorded:
+        names[query.casefold()] = recorded[query.casefold()]
     matches = sorted(names.get(query.casefold(), ()))
     if len(matches) == 1:
         return matches[0]
@@ -146,33 +164,42 @@ def _species(rows, query):
         raise ValueError(f"Ambiguous species {query!r}; use a scientific name: {', '.join(matches)}")
     close = get_close_matches(query.casefold(), sorted(names), n=3, cutoff=.55)
     suggestions = sorted({species for name in close for species in names[name]})[:3]
-    hint = f" Did you mean {', '.join(repr(s) for s in suggestions)}?" if suggestions else ""
+    display = preferred_names(rows)
+    hint = f" Did you mean {', '.join(repr(display[s]) + ' (' + s + ')' for s in suggestions)}?" if suggestions else ""
     raise ValueError(f"Unknown species {query!r} in retained data.{hint} Use 'dayclock species' to list available names.")
 
 
-def _range(rows, start, end):
+def _today(tz):
+    return datetime.now(tz).date()
+
+
+def _range(rows, start, end, *, tz=None, include_partial=False):
     if start is not None and end is not None and start > end:
         raise ValueError("Empty date range: --from must be on or before --to")
     if not rows:
         raise ValueError("No retained detections in the input files after review/confidence filtering")
     start = start if start is not None else min(r.date for r in rows)
-    end = end if end is not None else max(r.date for r in rows)
+    last = max(r.date for r in rows)
+    end = end if end is not None else last
+    partial = not include_partial and last == _today(tz) and end >= last
+    if partial:
+        end = last - timedelta(days=1)
     if start > end or not any(start <= r.date <= end for r in rows):
-        raise ValueError(f"Empty date range: no retained records from {start} to {end}")
+        hint = "; today is excluded by default, use --include-partial to keep it" if partial else ""
+        raise ValueError(f"Empty date range: no retained records from {start} to {end}{hint}")
     if end == date.max:
         raise ValueError("The last date must be before 9999-12-31")
+    if partial:
+        print(f"Excluding today's partial day ({last}); use --include-partial to keep it.", file=sys.stderr)
     return start, end
 
 
 def _list_species(rows):
     counts = Counter(r.scientific_name for r in rows)
-    common = defaultdict(Counter)
-    for row in rows:
-        if row.common_name:
-            common[row.scientific_name][row.common_name] += 1
+    display = preferred_names(rows)
     print("Scientific name\tCommon name\tDetections")
     for name in sorted(counts):
-        label = common[name].most_common(1)[0][0] if common[name] else ""
+        label = display[name] if display[name] != name else ""
         print(f"{name}\t{label}\t{counts[name]}")
 
 
@@ -203,14 +230,13 @@ def main(argv=None):
     try:
         datasets = _load(args)
         rows = [row for dataset in datasets for row in dataset]
-        start, end = _range(rows, args.start, args.end)
+        start, end = _range(rows, args.start, args.end, tz=args.tz, include_partial=args.include_partial)
         if args.command == "species":
             _list_species([r for r in rows if start <= r.date <= end])
             return 0
         species = _species(rows, args.species.strip())
         dates = [start + timedelta(days=i) for i in range((end - start).days + 1)]
-        common = Counter(r.common_name for r in rows if r.scientific_name == species and r.common_name)
-        name = common.most_common(1)[0][0] if common else species
+        name = preferred_names(rows)[species]
         import matplotlib
         matplotlib.use("Agg")
         if args.command == "heatmap":

@@ -61,6 +61,9 @@ def daily_counts(series, dates, *, title="Daily detections",
         ax.set_xlim(dates[0], dates[-1] + timedelta(days=1))
         ax.xaxis.set_major_locator(mdates.MonthLocator())
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%b'))
-    fig.text(.12, .047, 'Each panel has its own vertical scale. Grey = no records that day.', fontsize=9)
+    footer = 'Grey = no records that day.'
+    if len(series) > 1:
+        footer = 'Each panel has its own vertical scale. ' + footer
+    fig.text(.12, .047, footer, fontsize=9)
     add_logo(fig, logo)
     return fig

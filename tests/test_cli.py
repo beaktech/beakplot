@@ -268,3 +268,10 @@ def test_cli_v2_local_date_defaults_and_october_clock_change(tmp_path):
                      '--lat', '50', '--lon', '0', '--out', str(output)]) == 0
     text = ''.join(ET.parse(output).getroot().itertext())
     assert 'local clock time' in text
+
+
+@pytest.mark.parametrize('option', ['--db', '--csv'])
+def test_missing_input_has_friendly_exact_message(tmp_path, capsys, option):
+    path = tmp_path / 'missing file'
+    assert cli.main(['species', option, str(path)]) == 2
+    assert capsys.readouterr().err.strip() == f'dayclock: error: Database not found: {path}'

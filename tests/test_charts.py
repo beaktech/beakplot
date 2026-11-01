@@ -113,3 +113,12 @@ def test_short_heatmap_daylight_labels_stay_inside_figure(length):
     labels = [t for t in fig.axes[0].texts if t.get_text() in ('Sunrise', 'Sunset', 'Night')]
     assert len(labels) == 4
     assert all(t.get_window_extent().x1 <= fig.bbox.x1 for t in labels)
+
+
+@pytest.mark.parametrize('stations', [1, 2])
+def test_daily_scale_footer_only_for_multiple_stations(stations):
+    fig = daily_counts({f'Station {i}': [0, 1] for i in range(stations)},
+                       [date(2025, 4, 1), date(2025, 4, 2)])
+    footer = fig.texts[-1].get_text()
+    assert 'Grey = no records that day.' in footer
+    assert ('Each panel has its own vertical scale' in footer) == (stations > 1)
