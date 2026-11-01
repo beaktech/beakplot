@@ -3,7 +3,7 @@ from datetime import date, time, timedelta
 import numpy as np
 import pytest
 
-from dayclock import Detection, aggregate, trailing_mean
+from beakplot import Detection, aggregate, trailing_mean
 
 
 START = date(2025, 3, 1)

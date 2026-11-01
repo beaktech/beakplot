@@ -21,7 +21,7 @@ declares `license: CC-BY`. Downloaded and verified on 31 October 2026.
 Source archive SHA-256:
 `852b91a7b8ed2c66d86ea12896ea67be1b6b9d4d9bc5afe1c9f8a6b52d7c5495`
 
-Changes made by Day clock: joined the archive's `NameUsage.tsv` and
+Changes made by BeakPlot: joined the archive's `NameUsage.tsv` and
 `VernacularName.tsv` by taxon ID; kept accepted species and English (`eng`)
 names only; removed other fields and converted to a sorted JSON mapping.
 The bundled mapping has 11,250 entries. Scientific and English name strings
@@ -31,16 +31,16 @@ descriptions, recordings or detection data are included.
 To reproduce with the same archive, run:
 
 ```sh
-python scripts/build_common_names.py ioc.zip src/dayclock/resources/ioc-en.json
+python scripts/build_common_names.py ioc.zip src/beakplot/resources/ioc-en.json
 ```
 
-Day clock also matches unique endings of common names among species present
+BeakPlot also matches unique endings of common names among species present
 in the input, for example `Robin` for `European Robin`. This search behaviour
 does not alter the bundled IOC names.
 Names recorded in an input file take priority for display and exact common-name
 matching. Scientific names absent from the lookup remain usable unchanged.
 
-The data remains under CC BY 4.0; it is not relicensed under MIT. Day clock's
+The data remains under CC BY 4.0; it is not relicensed under MIT. BeakPlot's
 code, documentation and synthetic examples are under MIT. Redistribution of
 this data must retain appropriate credit, the licence link and the indication
 of changes. No endorsement by IOC, IOU, the editors or GBIF is implied.

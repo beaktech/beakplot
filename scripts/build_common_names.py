@@ -1,7 +1,7 @@
 """Extract the English species lookup from an IOC CoLDP archive (no downloads).
 
-Usage: python scripts/build_common_names.py ioc.zip src/dayclock/resources/ioc-en.json
-Source, version, checksum and licence: src/dayclock/resources/IOC-NOTICE.md.
+Usage: python scripts/build_common_names.py ioc.zip src/beakplot/resources/ioc-en.json
+Source, version, checksum and licence: src/beakplot/resources/IOC-NOTICE.md.
 """
 
 import argparse

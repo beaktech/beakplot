@@ -14,8 +14,8 @@ import matplotlib
 
 matplotlib.use('Agg')
 
-from dayclock import daily_counts, day_clock
-from dayclock.cli import _save
+from beakplot import daily_counts, day_clock
+from beakplot.cli import _save
 
 
 def generate(source, output, logo=None):

@@ -4,7 +4,7 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
-from dayclock import cli
+from beakplot import cli
 from test_cli import capture_plot
 
 

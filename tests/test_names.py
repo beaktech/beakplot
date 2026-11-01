@@ -4,9 +4,9 @@ import sqlite3
 
 import pytest
 
-from dayclock import Detection, common_name
-from dayclock import cli
-from dayclock.names import preferred_names
+from beakplot import Detection, common_name
+from beakplot import cli
+from beakplot.names import preferred_names
 from test_database import V2, add
 from test_cli import capture_plot
 

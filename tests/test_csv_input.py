@@ -2,7 +2,7 @@ from datetime import date
 
 import pytest
 
-from dayclock import aggregate, read_csv
+from beakplot import aggregate, read_csv
 
 
 def write_csv(tmp_path, text):

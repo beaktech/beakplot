@@ -1,31 +1,31 @@
-# Day clock
+# BeakPlot
 
-Day clock turns [BirdNET-Go](https://github.com/tphakala/birdnet-go) detections
+BeakPlot turns [BirdNET-Go](https://github.com/tphakala/birdnet-go) detections
 into seasonal charts for hobbyists, reserves and researchers. It reads either
 BirdNET-Go SQLite schema or a CSV export and produces SVG or PNG files.
 
 **A detection is an automatic identification, not an individual bird.** These
 charts show detection activity, not bird populations.
 
-The day clock heatmap puts 15-minute detection counts over local daylight and
+The heatmap puts 15-minute detection counts over local daylight and
 night. Daily counts show changes through the season with a seven-day average.
 
-![House martin detections at Keswick, with an evening peak following sunset](https://raw.githubusercontent.com/beaktech/dayclock/main/docs/images/heatmap.png)
+![House martin detections at Keswick, with an evening peak following sunset](https://raw.githubusercontent.com/beaktech/beakplot/main/docs/images/heatmap.png)
 
-![Daily house martin detections at Keswick, Haverthwaite and Kendal, with seven-day averages and grey recording gaps](https://raw.githubusercontent.com/beaktech/dayclock/main/docs/images/daily.png)
+![Daily house martin detections at Keswick, Haverthwaite and Kendal, with seven-day averages and grey recording gaps](https://raw.githubusercontent.com/beaktech/beakplot/main/docs/images/daily.png)
 
-Both charts were regenerated with Day clock from Beak Tech's already-published
+Both charts were regenerated with BeakPlot from Beak Tech's already-published
 aggregate counts for 20 June–8 October 2026. Data and original charts:
 [What autumn sounds like in the Lakes](https://beaktech.org/blog/listening-to-autumn),
 Beak Tech Community Interest Company. No individual detection records are bundled.
-The [synthetic example generator](https://github.com/beaktech/dayclock/blob/main/examples/generate.py) lets you try the tool
+The [synthetic example generator](https://github.com/beaktech/beakplot/blob/main/examples/generate.py) lets you try the tool
 without any data of your own.
 
 ## Install
 
 Requires Python 3.10 or newer. Runtime dependencies are Matplotlib, NumPy and
-the standard library. Day clock is not yet published on PyPI: install from this
-checkout, rather than running `pip install dayclock` against the package index.
+the standard library. BeakPlot is not yet published on PyPI: install from this
+checkout, rather than running `pip install beakplot` against the package index.
 
 For a command-line installation, run from the checkout:
 
@@ -42,25 +42,25 @@ python -m pip install .
 ```
 
 These shell examples use macOS/Linux activation. On Windows, activate with
-`.venv\Scripts\Activate.ps1` in PowerShell. `python -m dayclock` runs the same
-commands as `dayclock`. Every command has `--help`.
+`.venv\Scripts\Activate.ps1` in PowerShell. `python -m beakplot` runs the same
+commands as `beakplot`. Every command has `--help`.
 
 ## Quick start
 
 Start with a complete BirdNET-Go SQLite backup. If its `-wal` file is present,
 keep it alongside the database so recent committed detections are included.
-Day clock opens databases read-only and never runs migrations.
+BeakPlot opens databases read-only and never runs migrations.
 
 List the species and retained detection counts:
 
 ```sh
-dayclock species --db birdnet.db --tz Europe/London
+beakplot species --db birdnet.db --tz Europe/London
 ```
 
-Draw a day clock, using the station's time zone and coordinates:
+Draw a heatmap, using the station's time zone and coordinates:
 
 ```sh
-dayclock heatmap --db birdnet.db --species "Robin" \
+beakplot heatmap --db birdnet.db --species "Robin" \
   --tz Europe/London --lat 54.6 --lon -3.13 --out robin.svg
 ```
 
@@ -70,9 +70,9 @@ filter detections or identify a station. Use your own station's coordinates.
 Draw daily counts for one station, or compare several:
 
 ```sh
-dayclock daily --db birdnet.db --species "Robin" --tz Europe/London --out robin.png
+beakplot daily --db birdnet.db --species "Robin" --tz Europe/London --out robin.png
 
-dayclock daily --db first.db --db second.db --label First --label Second \
+beakplot daily --db first.db --db second.db --label First --label Second \
   --species "Erithacus rubecula" --tz Europe/London --out comparison.svg
 ```
 
@@ -96,12 +96,12 @@ one input; daily charts and species listings can take several.
 ### English names
 
 Names stored in the database or CSV take priority. When a common name is absent,
-Day clock uses the bundled [IOC World Bird List v15.2 English lookup](https://github.com/beaktech/dayclock/blob/main/src/dayclock/resources/IOC-NOTICE.md),
+BeakPlot uses the bundled [IOC World Bird List v15.2 English lookup](https://github.com/beaktech/beakplot/blob/main/src/beakplot/resources/IOC-NOTICE.md),
 with no network request. For example, `Erithacus rubecula` displays as
 `European Robin`; the familiar short search name `Robin` also works.
 
 Scientific names and common names match without regard to case. After exact
-matches, Day clock checks whole words at the end of common names among species
+matches, BeakPlot checks whole words at the end of common names among species
 present in your data: `Swallow` can select `Barn Swallow`, `Wren` can select
 `Eurasian Wren`, and `Robin` can select `European Robin`. It reports the full
 name chosen. If several species match, it lists them and asks for a full name.
@@ -121,7 +121,7 @@ applies to the `species` command. A today-only range explains how to opt in.
 Historical first and last days are kept. Detection records alone cannot tell
 whether those days were fully recorded; use `--from` and `--to` to trim known
 partial periods. A first detection at noon is not proof that recording began
-at noon. Day clock does not infer recorder uptime.
+at noon. BeakPlot does not infer recorder uptime.
 
 Legacy databases and CSVs contain local clock strings without an offset; these
 are preserved. Choose the station's actual time zone for sunlight and the
@@ -175,7 +175,7 @@ a confidence filter requires a column and scores on every row.
 Custom headers are configurable:
 
 ```sh
-dayclock daily --csv export.csv --species "Robin" \
+beakplot daily --csv export.csv --species "Robin" \
   --date-column observation_date --time-column observation_time \
   --species-column taxon --out robin.svg
 ```
@@ -189,7 +189,7 @@ SQLite and CSV inputs are separate command-line alternatives.
 ```python
 from datetime import date, timedelta
 import matplotlib.pyplot as plt
-from dayclock import aggregate, common_name, daily_counts, read_database
+from beakplot import aggregate, common_name, daily_counts, read_database
 
 rows = read_database("birdnet.db", tz="Europe/London")
 start, end = date(2025, 9, 1), date(2025, 9, 30)
@@ -218,7 +218,7 @@ From an installed source checkout:
 
 ```sh
 python examples/generate.py
-dayclock species --csv .local/examples/synthetic.csv
+beakplot species --csv .local/examples/synthetic.csv
 ```
 
 This creates deterministic synthetic detections plus both charts as SVG and PNG
@@ -255,12 +255,12 @@ python -m pip install -e '.[test]'
 python -m pytest
 ```
 
-Tests use synthetic detections and databases only. The [CI workflow](https://github.com/beaktech/dayclock/blob/main/.github/workflows/tests.yml)
+Tests use synthetic detections and databases only. The [CI workflow](https://github.com/beaktech/beakplot/blob/main/.github/workflows/tests.yml)
 runs the tests and synthetic examples on Python 3.10 and the latest stable
 Python 3 (`3.x`, resolved afresh by
 [setup-python](https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#using-the-python-version-input)).
-The [plan](https://github.com/beaktech/dayclock/blob/main/PLAN.md) and [review notes](https://github.com/beaktech/dayclock/blob/main/docs/phase-5-review.md) record development
-decisions. Version **0.1.0** is prepared locally; see the [changelog](https://github.com/beaktech/dayclock/blob/main/CHANGELOG.md).
+The [plan](https://github.com/beaktech/beakplot/blob/main/PLAN.md) and [review notes](https://github.com/beaktech/beakplot/blob/main/docs/phase-5-review.md) record development
+decisions. Version **0.1.0** is prepared locally; see the [changelog](https://github.com/beaktech/beakplot/blob/main/CHANGELOG.md).
 Publication to GitHub and PyPI remains for the owner.
 
 ## Credits and licences
@@ -273,12 +273,12 @@ Publication to GitHub and PyPI remains for the owner.
   Rasmussen and published through GBIF by the International Ornithologists'
   Union, provides the bundled English species names. The publisher marks the
   [dataset CC BY 4.0](https://www.gbif.org/dataset/c696e5ee-9088-4d11-bdae-ab88daffab78).
-  See the [attribution, version, checksum and extraction details](https://github.com/beaktech/dayclock/blob/main/src/dayclock/resources/IOC-NOTICE.md).
+  See the [attribution, version, checksum and extraction details](https://github.com/beaktech/beakplot/blob/main/src/beakplot/resources/IOC-NOTICE.md).
 - The daylight calculation follows [NOAA's solar equations](https://gml.noaa.gov/grad/solcalc/solareqns.PDF).
-- Day clock's original chart design and code were developed by **Beak Tech Community Interest Company**
+- BeakPlot's original chart design and code were developed by **Beak Tech Community Interest Company**
   for its seasonal bird-detection articles.
 
-Day clock's code, documentation and synthetic examples use the [MIT licence](https://github.com/beaktech/dayclock/blob/main/LICENSE).
+BeakPlot's code, documentation and synthetic examples use the [MIT licence](https://github.com/beaktech/beakplot/blob/main/LICENSE).
 The IOC lookup remains separately licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/);
 its attribution and licence notice travel with the installed package. No
 endorsement by IOC, IOU, GBIF or the BirdNET projects is implied.

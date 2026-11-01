@@ -10,8 +10,8 @@ from zoneinfo import ZoneInfo
 import numpy as np
 import pytest
 
-from dayclock import DatabaseError, aggregate, read_database, trailing_mean
-import dayclock.database as database
+from beakplot import DatabaseError, aggregate, read_database, trailing_mean
+import beakplot.database as database
 
 
 # Only columns relevant to the reader are needed; unrelated source/model/audio

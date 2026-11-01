@@ -11,8 +11,8 @@ import math
 from pathlib import Path
 import random
 
-from dayclock import sun_times
-from dayclock.cli import main
+from beakplot import sun_times
+from beakplot.cli import main
 
 
 def generate(output):
@@ -45,7 +45,7 @@ def generate(output):
                                      "Erithacus rubecula", identity, .9])
     for extension in ("svg", "png"):
         for command, title, options in (
-                ("heatmap", "European Robin — synthetic day clock",
+                ("heatmap", "European Robin — synthetic heatmap",
                  ["--lat", "54.6", "--lon", "-3.13", "--vmax", "40"]),
                 ("daily", "European Robin — synthetic daily counts", ["--label", "Synthetic station"])):
             status = main([command, "--csv", str(source), "--species", "Robin",

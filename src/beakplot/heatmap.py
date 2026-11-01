@@ -1,10 +1,10 @@
-"""Beak Tech's "day clock" heatmap: detections by date and time of day.
+"""Beak Tech's daylight heatmap: detections by date and time of day.
 
 Each column is one day and each square 15 minutes, drawn over that place's
 daylight (between the day's real sunrise and sunset) and night, so readers can
 see at a glance whether a pattern belongs to dawn, the day or dusk.
 
-    from dayclock import day_clock
+    from beakplot import day_clock
     fig = day_clock(rows, dates, lat, lon, title=..., subtitle=...)
 
 `rows` holds one entry per date: 96 quarter-hour detection counts, or None for

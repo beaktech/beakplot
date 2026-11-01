@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
-from dayclock import cli
+from beakplot import cli
 from test_database import LEGACY, V2, add
 
 
@@ -165,7 +165,7 @@ def test_module_command_renders_real_files(input_db, tmp_path, kind, extension):
                                                '--subtitle', 'Synthetic subtitle']
     if kind == 'heatmap':
         args += ['--vmax', '10']
-    result = subprocess.run([sys.executable, '-m', 'dayclock', *args], capture_output=True, text=True,
+    result = subprocess.run([sys.executable, '-m', 'beakplot', *args], capture_output=True, text=True,
                             env={**os.environ, 'MPLBACKEND': 'Agg'}, timeout=30)
     assert result.returncode == 0, result.stderr
     assert '2025-04-02 to 2025-04-05' in result.stdout
@@ -237,7 +237,7 @@ def test_species_ambiguity_and_no_close_match(tmp_path, capsys):
     assert 'Ambiguous species' in capsys.readouterr().err
     assert cli.main(args + ['zzzzzzzzz']) == 2
     error = capsys.readouterr().err
-    assert 'Unknown species' in error and 'dayclock species' in error
+    assert 'Unknown species' in error and 'beakplot species' in error
 
 
 def test_csv_multi_monitor_file_is_rejected(tmp_path, capsys):
@@ -250,7 +250,7 @@ def test_csv_multi_monitor_file_is_rejected(tmp_path, capsys):
 
 
 def test_module_errors_exit_two_without_traceback(tmp_path):
-    result = subprocess.run([sys.executable, '-m', 'dayclock', 'species', '--db', str(tmp_path / 'missing.db')],
+    result = subprocess.run([sys.executable, '-m', 'beakplot', 'species', '--db', str(tmp_path / 'missing.db')],
                             capture_output=True, text=True, timeout=30)
     assert result.returncode == 2
     assert 'missing.db' in result.stderr and 'Traceback' not in result.stderr
@@ -274,4 +274,4 @@ def test_cli_v2_local_date_defaults_and_october_clock_change(tmp_path):
 def test_missing_input_has_friendly_exact_message(tmp_path, capsys, option):
     path = tmp_path / 'missing file'
     assert cli.main(['species', option, str(path)]) == 2
-    assert capsys.readouterr().err.strip() == f'dayclock: error: Database not found: {path}'
+    assert capsys.readouterr().err.strip() == f'beakplot: error: Database not found: {path}'

@@ -51,7 +51,7 @@ def _zone(value):
 
 
 def _parser():
-    parser = argparse.ArgumentParser(prog="dayclock", description="Seasonal bird detection charts.")
+    parser = argparse.ArgumentParser(prog="beakplot", description="Seasonal bird detection charts.")
     commands = parser.add_subparsers(dest="command", required=True)
     for name, description in (("heatmap", "Detections by date and time over local daylight"),
                               ("daily", "Daily detections and a seven-day average"),
@@ -193,7 +193,7 @@ def _species(rows, query):
     close = get_close_matches(key, sorted(names), n=3, cutoff=.55)
     suggestions = sorted({species for name in close for species in names[name]})[:3]
     hint = f" Did you mean {describe(suggestions)}?" if suggestions else ""
-    raise ValueError(f"Unknown species {query!r} in retained data.{hint} Use 'dayclock species' to list available names.")
+    raise ValueError(f"Unknown species {query!r} in retained data.{hint} Use 'beakplot species' to list available names.")
 
 
 def _today(tz):
@@ -239,7 +239,7 @@ def _save(fig, output):
         with tempfile.NamedTemporaryFile(dir=output.parent, suffix=output.suffix, delete=False) as handle:
             temporary = Path(handle.name)
         fmt = output.suffix.lower().lstrip(".")
-        options = {"metadata": {"Date": None, "Creator": "Day clock"}} if fmt == "svg" else {}
+        options = {"metadata": {"Date": None, "Creator": "BeakPlot"}} if fmt == "svg" else {}
         with plt.rc_context(STYLE):
             fig.savefig(temporary, format=fmt, dpi=200 if fmt == "svg" else 240,
                         facecolor="white", **options)
@@ -280,5 +280,5 @@ def main(argv=None):
         print(f"Saved {args.out} ({start} to {end})")
         return 0
     except (OSError, ValueError) as error:
-        print(f"dayclock: error: {error}", file=sys.stderr)
+        print(f"beakplot: error: {error}", file=sys.stderr)
         return 2

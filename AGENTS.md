@@ -1,6 +1,6 @@
 # Agent instructions
 
-Read [PLAN.md](PLAN.md) before doing anything. It is the brief for this repo: what Day clock is, the phases, and the ground rules. Stop after each phase for the owner's review.
+Read [PLAN.md](PLAN.md) before doing anything. It is the brief for this repo: what BeakPlot is, the phases, and the ground rules. Stop after each phase for the owner's review.
 
 ## Work tracking
 

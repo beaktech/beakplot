@@ -2,9 +2,10 @@
 
 ## 0.1.0 — prepared, not yet published
 
-First release of Day clock.
+First release of BeakPlot. It was developed as Day clock and renamed before its first
+PyPI release; the `dayclock` name was never published there.
 
-- Day clock heatmaps with 15-minute counts, local daylight, recording gaps and
+- Heatmaps with 15-minute counts, local daylight, recording gaps and
   optional fixed colour scales; daily counts with a trailing seven-day average.
 - Read-only support for BirdNET-Go's legacy and v2 SQLite schemas, plus CSV
   input with configurable column names.

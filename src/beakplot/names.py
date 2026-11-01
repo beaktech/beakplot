@@ -8,7 +8,7 @@ import json
 
 @lru_cache(maxsize=1)
 def _lookup():
-    resource = files("dayclock").joinpath("resources").joinpath("ioc-en.json")
+    resource = files("beakplot").joinpath("resources").joinpath("ioc-en.json")
     return {name.casefold(): common for name, common in json.loads(resource.read_text(encoding="utf-8")).items()}
 
 

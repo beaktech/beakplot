@@ -3,13 +3,13 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "dayclock"
+name = "beakplot"
 version = "0.1.0"
 description = "Seasonal bird detection charts with daylight and recording gaps"
 authors = [{ name = "Beak Tech", email = "hello@beaktech.org" }]
 readme = "README.md"
 license = "MIT AND CC-BY-4.0"
-license-files = ["LICENSE", "src/dayclock/resources/IOC-NOTICE.md"]
+license-files = ["LICENSE", "src/beakplot/resources/IOC-NOTICE.md"]
 requires-python = ">=3.10"
 dependencies = ["matplotlib>=3.6", "numpy>=1.23"]
 keywords = ["birdnet", "birdnet-go", "birds", "bioacoustics", "charts"]
@@ -23,12 +23,12 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/beaktech/dayclock"
-Changelog = "https://github.com/beaktech/dayclock/blob/main/CHANGELOG.md"
-Issues = "https://github.com/beaktech/dayclock/issues"
+Homepage = "https://github.com/beaktech/beakplot"
+Changelog = "https://github.com/beaktech/beakplot/blob/main/CHANGELOG.md"
+Issues = "https://github.com/beaktech/beakplot/issues"
 
 [project.scripts]
-dayclock = "dayclock.cli:main"
+beakplot = "beakplot.cli:main"
 
 [project.optional-dependencies]
 test = ["pytest>=7"]
@@ -37,7 +37,7 @@ test = ["pytest>=7"]
 where = ["src"]
 
 [tool.setuptools.package-data]
-dayclock = ["resources/*.json", "resources/*.md"]
+beakplot = ["resources/*.json", "resources/*.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

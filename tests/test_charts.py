@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
-from dayclock import daily_counts, day_clock, sun_times
-from dayclock.heatmap import clock_name
+from beakplot import daily_counts, day_clock, sun_times
+from beakplot.heatmap import clock_name
 
 
 def test_sunrise_and_sunset_at_greenwich_summer_solstice():

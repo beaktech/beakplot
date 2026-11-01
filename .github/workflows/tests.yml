@@ -28,5 +28,5 @@ jobs:
         run: python -m pytest
       - name: Exercise the installed command and synthetic examples
         run: |
-          dayclock --help
+          beakplot --help
           python examples/generate.py
