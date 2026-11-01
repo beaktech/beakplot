@@ -15,6 +15,8 @@ class Detection:
     detection_id: str | None = None
     monitor_id: str = ""
     review_status: str = ""
+    common_name: str = ""
+    confidence: float | None = None
 
 
 @dataclass
