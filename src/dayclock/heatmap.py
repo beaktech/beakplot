@@ -124,10 +124,10 @@ def day_clock(rows, dates, lat, lon, *, title="Detections by date and time",
 
     for series, label in ((sets, 'Sunset'), (rise, 'Sunrise')):
         ax.plot(mids, series, color=SUN_LINE, lw=1.1, zorder=4)
-        ax.text(x1 + 1.2, series[-1], label, ha='left', va='center', fontsize=10.5,
+        ax.text(x1 + min(1.2, (x1 - x0) * .02), series[-1], label, ha='left', va='center', fontsize=10.5,
                 color=SUN_TEXT, fontweight='bold', clip_on=False)
     for hour in (23, 1):
-        ax.text(x0 + 1.5, hour, 'Night', ha='left', va='center', fontsize=10.5, color='#6b7d91', zorder=5)
+        ax.text(x0 + min(1.5, (x1 - x0) * .04), hour, 'Night', ha='left', va='center', fontsize=10.5, color='#6b7d91', zorder=5)
 
     ax.set_xlim(x0, x1)
     ax.set_ylim(0, 24)
@@ -157,11 +157,14 @@ def day_clock(rows, dates, lat, lon, *, title="Detections by date and time",
 def _key(fig, vmax, clipped, has_missing):
     """Colour scale with numbers, what blank and hatched mean, and how to read the grid."""
     bar = fig.add_axes([0.13, 0.81, 0.24, 0.022])
+    extent = [0.5, 1.5, 0, 1] if vmax == 1 else [1, vmax, 0, 1]
     bar.imshow(np.linspace(1, vmax, 128)[None, :], aspect='auto', cmap=DETECTIONS,
-               extent=[1, vmax, 0, 1])
+               extent=extent)
     step = vmax / 4 if vmax % 4 == 0 and (vmax / 4) % 5 == 0 else (5 if vmax <= 20 else 10 if vmax <= 100 else 50)
     ticks = [1] + list(range(int(step), int(vmax) + 1, int(step)))
-    bar.set_xticks(ticks, [f'{t}' + ('+' if clipped and t == vmax else '') for t in ticks])
+    if ticks[-1] != vmax:
+        ticks.append(vmax)
+    bar.set_xticks(ticks, [f'{t:g}' + ('+' if clipped and t == vmax else '') for t in ticks])
     bar.set_yticks([])
     bar.tick_params(length=3, labelsize=9.5, colors=INK, pad=3)
     for spine in bar.spines.values():

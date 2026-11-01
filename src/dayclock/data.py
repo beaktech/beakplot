@@ -36,6 +36,24 @@ def validate_dates(dates):
         raise ValueError("Dates must be consecutive and in ascending order")
 
 
+def retained_records(records, *, excluded_ids=()):
+    """Yield records once per monitor/ID, excluding any false-positive copies."""
+    records = list(records)
+    excluded = set(excluded_ids)
+    excluded.update((r.monitor_id, r.detection_id) for r in records
+                    if r.detection_id is not None and r.review_status == "false_positive")
+    seen = set()
+    for row in records:
+        identity = (row.monitor_id, row.detection_id)
+        if row.review_status == "false_positive" or identity in excluded:
+            continue
+        if row.detection_id is not None:
+            if identity in seen:
+                continue
+            seen.add(identity)
+        yield row
+
+
 def aggregate(records, dates, species, *, excluded_ids=()):
     """Count one species over dates, using all retained species for coverage.
 
@@ -46,21 +64,9 @@ def aggregate(records, dates, species, *, excluded_ids=()):
     Coverage is evidence of records, not proof of continuous recording.
     """
     validate_dates(dates)
-    records = list(records)
-    excluded = set(excluded_ids)
-    excluded.update((r.monitor_id, r.detection_id) for r in records
-                    if r.detection_id is not None and r.review_status == "false_positive")
     coverage, counts, bins = Counter(), Counter(), Counter()
-    seen = set()
     wanted = set(dates)
-    for row in records:
-        identity = (row.monitor_id, row.detection_id)
-        if row.review_status == "false_positive" or identity in excluded:
-            continue
-        if row.detection_id is not None:
-            if identity in seen:
-                continue
-            seen.add(identity)
+    for row in retained_records(records, excluded_ids=excluded_ids):
         if row.date not in wanted:
             continue
         coverage[row.date] += 1

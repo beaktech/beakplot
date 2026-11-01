@@ -27,7 +27,8 @@ def daily_counts(series, dates, *, title="Daily detections",
         raise ValueError("Provide one daily count per date in each series")
     fig, axes = plt.subplots(len(series), 1, figsize=(9, 3 + 1.8 * len(series)), sharex=True, squeeze=False)
     compact = len(series) == 2
-    fig.subplots_adjust(left=.12, right=.97, top=from_top(fig, 136), bottom=.13 if compact else .10, hspace=.48)
+    bottom = .16 if len(series) == 1 else .13 if compact else .10
+    fig.subplots_adjust(left=.12, right=.97, top=from_top(fig, 136), bottom=bottom, hspace=.48)
     fig.suptitle(title, x=.12, y=from_top(fig, 18), va='top', ha='left', fontsize=21, fontweight='bold')
     fig.text(.12, from_top(fig, 54), subtitle, va='top', fontsize=12)
     fig.legend(handles=[Line2D([0], [0], color='#9abcae', lw=5, label='Daily detections'),

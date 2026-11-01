@@ -94,3 +94,22 @@ def test_zero_series_with_annotation_request_does_not_crash_or_change_global_sty
 def test_invalid_heatmap_counts(rows, vmax):
     with pytest.raises(ValueError):
         day_clock(rows, [date(2025, 4, 1)], 50, 0, vmax=vmax)
+
+
+@pytest.mark.parametrize('vmax,label', [(1, '1+'), (2.5, '2.5+')])
+def test_fixed_small_colour_limits_have_a_label_without_warnings(vmax, label):
+    with warnings.catch_warnings():
+        warnings.simplefilter('error')
+        fig = day_clock([[3] * 96], [date(2025, 4, 1)], 50, 0, tz='UTC', vmax=vmax)
+        fig.savefig(BytesIO(), format='svg')
+    assert fig.axes[1].get_xticklabels()[-1].get_text() == label
+
+
+@pytest.mark.parametrize('length', [1, 3, 21])
+def test_short_heatmap_daylight_labels_stay_inside_figure(length):
+    dates = [date(2025, 4, 1) + timedelta(days=i) for i in range(length)]
+    fig = day_clock([[0] * 96 for _ in dates], dates, 50, 0, tz='UTC')
+    fig.canvas.draw()
+    labels = [t for t in fig.axes[0].texts if t.get_text() in ('Sunrise', 'Sunset', 'Night')]
+    assert len(labels) == 4
+    assert all(t.get_window_extent().x1 <= fig.bbox.x1 for t in labels)
