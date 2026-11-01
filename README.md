@@ -10,15 +10,15 @@ charts show detection activity, not bird populations.
 The day clock heatmap puts 15-minute detection counts over local daylight and
 night. Daily counts show changes through the season with a seven-day average.
 
-![House martin detections at Keswick, with an evening peak following sunset](docs/images/heatmap.png)
+![House martin detections at Keswick, with an evening peak following sunset](https://raw.githubusercontent.com/beaktech/dayclock/main/docs/images/heatmap.png)
 
-![Daily house martin detections at Keswick, Haverthwaite and Kendal, with seven-day averages and grey recording gaps](docs/images/daily.png)
+![Daily house martin detections at Keswick, Haverthwaite and Kendal, with seven-day averages and grey recording gaps](https://raw.githubusercontent.com/beaktech/dayclock/main/docs/images/daily.png)
 
 Both charts were regenerated with Day clock from Beak Tech's already-published
 aggregate counts for 20 June–8 October 2026. Data and original charts:
 [What autumn sounds like in the Lakes](https://beaktech.org/blog/listening-to-autumn),
 Beak Tech Community Interest Company. No individual detection records are bundled.
-The [synthetic example generator](examples/generate.py) lets you try the tool
+The [synthetic example generator](https://github.com/beaktech/dayclock/blob/main/examples/generate.py) lets you try the tool
 without any data of your own.
 
 ## Install
@@ -96,7 +96,7 @@ one input; daily charts and species listings can take several.
 ### English names
 
 Names stored in the database or CSV take priority. When a common name is absent,
-Day clock uses the bundled [IOC World Bird List v15.2 English lookup](src/dayclock/resources/IOC-NOTICE.md),
+Day clock uses the bundled [IOC World Bird List v15.2 English lookup](https://github.com/beaktech/dayclock/blob/main/src/dayclock/resources/IOC-NOTICE.md),
 with no network request. For example, `Erithacus rubecula` displays as
 `European Robin`; the familiar short search name `Robin` also works.
 
@@ -255,12 +255,12 @@ python -m pip install -e '.[test]'
 python -m pytest
 ```
 
-Tests use synthetic detections and databases only. The [CI workflow](.github/workflows/tests.yml)
+Tests use synthetic detections and databases only. The [CI workflow](https://github.com/beaktech/dayclock/blob/main/.github/workflows/tests.yml)
 runs the tests and synthetic examples on Python 3.10 and the latest stable
 Python 3 (`3.x`, resolved afresh by
 [setup-python](https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#using-the-python-version-input)).
-The [plan](PLAN.md) and [review notes](docs/phase-5-review.md) record development
-decisions. Version **0.1.0** is prepared locally; see the [changelog](CHANGELOG.md).
+The [plan](https://github.com/beaktech/dayclock/blob/main/PLAN.md) and [review notes](https://github.com/beaktech/dayclock/blob/main/docs/phase-5-review.md) record development
+decisions. Version **0.1.0** is prepared locally; see the [changelog](https://github.com/beaktech/dayclock/blob/main/CHANGELOG.md).
 Publication to GitHub and PyPI remains for the owner.
 
 ## Credits and licences
@@ -273,12 +273,12 @@ Publication to GitHub and PyPI remains for the owner.
   Rasmussen and published through GBIF by the International Ornithologists'
   Union, provides the bundled English species names. The publisher marks the
   [dataset CC BY 4.0](https://www.gbif.org/dataset/c696e5ee-9088-4d11-bdae-ab88daffab78).
-  See the [attribution, version, checksum and extraction details](src/dayclock/resources/IOC-NOTICE.md).
+  See the [attribution, version, checksum and extraction details](https://github.com/beaktech/dayclock/blob/main/src/dayclock/resources/IOC-NOTICE.md).
 - The daylight calculation follows [NOAA's solar equations](https://gml.noaa.gov/grad/solcalc/solareqns.PDF).
 - Day clock's original chart design and code were developed by **Beak Tech Community Interest Company**
   for its seasonal bird-detection articles.
 
-Day clock's code, documentation and synthetic examples use the [MIT licence](LICENSE).
+Day clock's code, documentation and synthetic examples use the [MIT licence](https://github.com/beaktech/dayclock/blob/main/LICENSE).
 The IOC lookup remains separately licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/);
 its attribution and licence notice travel with the installed package. No
 endorsement by IOC, IOU, GBIF or the BirdNET projects is implied.

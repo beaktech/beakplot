@@ -6,11 +6,26 @@ build-backend = "setuptools.build_meta"
 name = "dayclock"
 version = "0.1.0"
 description = "Seasonal bird detection charts with daylight and recording gaps"
+authors = [{ name = "Beak Tech", email = "hello@beaktech.org" }]
 readme = "README.md"
 license = "MIT AND CC-BY-4.0"
 license-files = ["LICENSE", "src/dayclock/resources/IOC-NOTICE.md"]
 requires-python = ">=3.10"
 dependencies = ["matplotlib>=3.6", "numpy>=1.23"]
+keywords = ["birdnet", "birdnet-go", "birds", "bioacoustics", "charts"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Visualization",
+]
+
+[project.urls]
+Homepage = "https://github.com/beaktech/dayclock"
+Changelog = "https://github.com/beaktech/dayclock/blob/main/CHANGELOG.md"
+Issues = "https://github.com/beaktech/dayclock/issues"
 
 [project.scripts]
 dayclock = "dayclock.cli:main"
