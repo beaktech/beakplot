@@ -16,7 +16,7 @@ from .data import aggregate, retained_records
 from .database import read_database
 from .daily import daily_counts
 from .heatmap import day_clock
-from .names import ALIASES, common_name, preferred_names
+from .names import common_name, preferred_names
 from .style import DEFAULT_SUBTITLE, STYLE
 
 
@@ -80,7 +80,9 @@ def _parser():
             csv_options.add_argument(f"--{option}-column", dest=f"column_{field}", metavar="HEADER")
         if name == "species":
             continue
-        command.add_argument("--species", required=True, help="scientific name or unambiguous English common name (case-insensitive)")
+        command.add_argument("--species", required=True,
+                             help="scientific name, English common name or unique ending such as Swallow "
+                                  "(case-insensitive); short matches report the chosen species")
         command.add_argument("--out", required=True, type=Path, help="output .svg or .png file (parent directory must exist)")
         command.add_argument("--title", help="chart title; default uses the common name where available")
         command.add_argument("--subtitle", default=DEFAULT_SUBTITLE, help="chart subtitle")
@@ -139,8 +141,10 @@ def _load(args):
 
 
 def _species(rows, query):
+    query = query.strip()
+    key = query.casefold()
     scientific = {r.scientific_name for r in rows}
-    exact = sorted(name for name in scientific if name.casefold() == query.casefold())
+    exact = sorted(name for name in scientific if name.casefold() == key)
     if len(exact) == 1:
         return exact[0]
     recorded = defaultdict(set)
@@ -148,24 +152,47 @@ def _species(rows, query):
         if row.common_name:
             recorded[row.common_name.casefold()].add(row.scientific_name)
     # An exact recorded name takes priority even over another species' bundled
-    # name or alias. Ambiguity in recorded names still needs a scientific name.
+    # name. Ambiguity in recorded names still needs a scientific name.
     names = defaultdict(set)
     for name in scientific:
-        for label in (name, common_name(name), *ALIASES.get(name, ())):
+        for label in (name, common_name(name)):
             names[label.casefold()].add(name)
     for label, species in recorded.items():
         names[label].update(species)
-    if query.casefold() in recorded:
-        names[query.casefold()] = recorded[query.casefold()]
-    matches = sorted(names.get(query.casefold(), ()))
+    if key in recorded:
+        names[key] = recorded[key]
+    display = preferred_names(rows)
+
+    def describe(matches):
+        return ', '.join(repr(display[s]) + ' (' + s + ')' for s in matches)
+
+    matches = sorted(names.get(key, ()))
     if len(matches) == 1:
         return matches[0]
     if matches:
-        raise ValueError(f"Ambiguous species {query!r}; use a scientific name: {', '.join(matches)}")
-    close = get_close_matches(query.casefold(), sorted(names), n=3, cutoff=.55)
+        raise ValueError(f"Ambiguous species {query!r}; use a scientific name: {describe(matches)}")
+    # Match whole trailing words, using recorded names before IOC fallbacks.
+    # Build from present species only; the lookup cannot introduce a species.
+    endings = defaultdict(set)
+    for name in scientific:
+        labels = [label for label, species in recorded.items() if name in species]
+        if not labels and common_name(name) != name:
+            labels = [common_name(name).casefold()]
+        for label in labels:
+            words = label.split()
+            for i in range(1, len(words)):
+                endings[' '.join(words[i:])].add(name)
+    matches = sorted(endings.get(key, ()))
+    if len(matches) == 1:
+        print(f"Matched {query!r} to {describe(matches)}.", file=sys.stderr)
+        return matches[0]
+    if matches:
+        raise ValueError(f"Ambiguous species {query!r}; use a full name: {describe(matches)}")
+    for label, species in endings.items():
+        names[label].update(species)
+    close = get_close_matches(key, sorted(names), n=3, cutoff=.55)
     suggestions = sorted({species for name in close for species in names[name]})[:3]
-    display = preferred_names(rows)
-    hint = f" Did you mean {', '.join(repr(display[s]) + ' (' + s + ')' for s in suggestions)}?" if suggestions else ""
+    hint = f" Did you mean {describe(suggestions)}?" if suggestions else ""
     raise ValueError(f"Unknown species {query!r} in retained data.{hint} Use 'dayclock species' to list available names.")
 
 

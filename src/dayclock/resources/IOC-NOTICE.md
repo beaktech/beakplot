@@ -34,8 +34,9 @@ To reproduce with the same archive, run:
 python scripts/build_common_names.py ioc.zip src/dayclock/resources/ioc-en.json
 ```
 
-The short search alias `Robin` for `Erithacus rubecula` is a Day clock addition
-in Python code. It does not replace IOC's preferred name, `European Robin`.
+Day clock also matches unique endings of common names among species present
+in the input, for example `Robin` for `European Robin`. This search behaviour
+does not alter the bundled IOC names.
 Names recorded in an input file take priority for display and exact common-name
 matching. Scientific names absent from the lookup remain usable unchanged.
 

@@ -6,10 +6,6 @@ from importlib.resources import files
 import json
 
 
-# A familiar British short name; this alias is ours, not an IOC name change.
-ALIASES = {"Erithacus rubecula": ("Robin",)}
-
-
 @lru_cache(maxsize=1)
 def _lookup():
     resource = files("dayclock").joinpath("resources").joinpath("ioc-en.json")

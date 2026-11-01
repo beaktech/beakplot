@@ -10,12 +10,16 @@ charts show detection activity, not bird populations.
 The day clock heatmap puts 15-minute detection counts over local daylight and
 night. Daily counts show changes through the season with a seven-day average.
 
-![Day clock heatmap with synthetic robin detections following dawn and dusk, and hatched recording gaps](docs/images/heatmap.png)
+![House martin detections at Keswick, with an evening peak following sunset](docs/images/heatmap.png)
 
-![Daily synthetic robin detections with a seven-day average and grey recording gaps](docs/images/daily.png)
+![Daily house martin detections at Keswick, Haverthwaite and Kendal, with seven-day averages and grey recording gaps](docs/images/daily.png)
 
-Both images use **synthetic data only**, created by
-[examples/generate.py](examples/generate.py). They are demonstrations, not observations.
+Both charts were regenerated with Day clock from Beak Tech's already-published
+aggregate counts for 20 June–8 October 2026. Data and original charts:
+[What autumn sounds like in the Lakes](https://beaktech.org/blog/listening-to-autumn),
+Beak Tech Community Interest Company. No individual detection records are bundled.
+The [synthetic example generator](examples/generate.py) lets you try the tool
+without any data of your own.
 
 ## Install
 
@@ -96,9 +100,13 @@ Day clock uses the bundled [IOC World Bird List v15.2 English lookup](src/dayclo
 with no network request. For example, `Erithacus rubecula` displays as
 `European Robin`; the familiar short search name `Robin` also works.
 
-Scientific names and common names match without regard to case. A common name
-must identify a single species in your data; use the scientific name when it
-is ambiguous. Misspellings suggest close matches. The lookup never adds species
+Scientific names and common names match without regard to case. After exact
+matches, Day clock checks whole words at the end of common names among species
+present in your data: `Swallow` can select `Barn Swallow`, `Wren` can select
+`Eurasian Wren`, and `Robin` can select `European Robin`. It reports the full
+name chosen. If several species match, it lists them and asks for a full name.
+Recorded names take priority over IOC names; an exact name wins over a short
+match. Misspellings suggest close matches. The lookup never adds species
 or detections to your records, and an unrecognised scientific name is kept as-is.
 The lookup follows IOC's naming and spelling conventions, including `Grey Heron`.
 
@@ -214,8 +222,20 @@ dayclock species --csv .local/examples/synthetic.csv
 ```
 
 This creates deterministic synthetic detections plus both charts as SVG and PNG
-under ignored `.local/examples/`. It reads no backups or real detections. The
-README images are the PNG outputs of this script.
+under ignored `.local/examples/`. It reads no backups or real detections. These
+synthetic charts are separate from the article charts shown in this README.
+
+To recreate the README images from a local Beak Tech website checkout:
+
+```sh
+python examples/regenerate_article.py ../beak-tech/scripts/data/seasonal-2026.json \
+  --logo ../beak-tech/public/images/logo.png --out docs/images
+```
+
+This reads only the published aggregate counts and optional logo; it does not
+copy the source JSON or use detection exports. Grey daily-chart gaps are centred
+on the missing day, retaining the correction approved during the original
+chart comparison.
 
 ## Errors and limits
 
@@ -235,9 +255,13 @@ python -m pip install -e '.[test]'
 python -m pytest
 ```
 
-Tests use synthetic detections and databases only. The [plan](PLAN.md) and
-[review notes](docs/phase-4-review.md) record development decisions. Version
-0.1.0, CI and publication are not part of this phase.
+Tests use synthetic detections and databases only. The [CI workflow](.github/workflows/tests.yml)
+runs the tests and synthetic examples on Python 3.10 and the latest stable
+Python 3 (`3.x`, resolved afresh by
+[setup-python](https://github.com/actions/setup-python/blob/main/docs/advanced-usage.md#using-the-python-version-input)).
+The [plan](PLAN.md) and [review notes](docs/phase-5-review.md) record development
+decisions. Version **0.1.0** is prepared locally; see the [changelog](CHANGELOG.md).
+Publication to GitHub and PyPI remains for the owner.
 
 ## Credits and licences
 
@@ -251,7 +275,7 @@ Tests use synthetic detections and databases only. The [plan](PLAN.md) and
   [dataset CC BY 4.0](https://www.gbif.org/dataset/c696e5ee-9088-4d11-bdae-ab88daffab78).
   See the [attribution, version, checksum and extraction details](src/dayclock/resources/IOC-NOTICE.md).
 - The daylight calculation follows [NOAA's solar equations](https://gml.noaa.gov/grad/solcalc/solareqns.PDF).
-- Day clock's original chart design and code were developed by **Beak Tech CIC**
+- Day clock's original chart design and code were developed by **Beak Tech Community Interest Company**
   for its seasonal bird-detection articles.
 
 Day clock's code, documentation and synthetic examples use the [MIT licence](LICENSE).

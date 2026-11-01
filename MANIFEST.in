@@ -1,0 +1,8 @@
+include CHANGELOG.md PLAN.md
+recursive-include docs *.md *.png
+recursive-include examples *.py
+recursive-include scripts *.py
+recursive-include tests *.py
+include .github/workflows/tests.yml
+prune .local
+prune .venv
